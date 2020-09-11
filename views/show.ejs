@@ -1,0 +1,83 @@
+<%-include("./partials/header")%>
+<h1>
+	
+</h1>
+<div class="ui main text container segment">
+	<div class="ui center aligned purple huge header"><%=blog.title%></div>
+	<div class="ui top attached">
+		<div class="item">
+			<img src="<%=blog.image%>" class="ui big centered rounded image">
+			<h4 class="ui horizontal divider header">
+ 				Created On
+			</h4>
+			<div class="content">
+				<p><%=blog.created.toLocaleString(undefined, {timeZone: 'Asia/Kolkata'})%></p>		
+			</div>
+			
+			
+			<h4 class="ui horizontal divider header">
+ 				Recipe
+			</h4>
+			
+			
+			<div class="description">
+				<p><%-blog.body%></p>			
+			</div>
+			
+			
+			<h4 class="ui horizontal divider header">
+ 				Actions
+			</h4>
+			
+			
+			<%if(currentUser && currentUser.username === "amisha@ravi2007") { %>
+				<a href="/blogs/<%=blog._id%>/edit" class="ui orange basic button">Edit!</a>
+				<form method="POST" action="/blogs/<%=blog._id%>?_method=DELETE" style="display:inline">
+					<button class="ui red basic button" >
+						Delete
+					</button>	
+				</form>
+			<%}%>
+			<a href="/blogs/<%=blog._id%>/newComment" class="ui blue basic button">Add comment</a>
+		</div>
+	</div>
+	
+		
+	
+	
+	
+<div class="ui comments">
+	 <h3 class="ui dividing header">Comments</h3>
+<% blog.comments.forEach(function(comment) {%>
+ 
+  <div class="comment">
+    <!-- <a class="avatar">
+      <img src="/images/avatar/small/matt.jpg">
+    </a> -->
+    <div class="content">
+      <a class="author"><%=comment.author.username%></a>
+      <div class="metadata">
+        <span class="date"><%=comment.created.toLocaleString(undefined, {timeZone: 'Asia/Kolkata'})%></span>
+      </div>
+      <div class="text">
+        <%=comment.text%><br><br>
+		<%if(currentUser && (comment.author.id.equals(currentUser._id)||currentUser.username==="amisha@ravi2007")) { %>
+		<span>
+			<a class="ui purple button mini" href="/blogs/<%=blog._id%>/comments/<%=comment._id%>/edit">Edit</a>
+			<form style="display:inline" action="/blogs/<%=blog._id %>/comments/<%=comment._id %>?_method=DELETE" method="POST">
+				<input type="submit" value="Delete" class="ui red button mini">
+			</form>
+		</span>  
+		  <%}%>
+      </div>
+     
+    </div>
+  	</div>
+	<% }); %>
+	</div>
+	
+		
+</div>
+
+
+<%-include("./partials/footer")%>

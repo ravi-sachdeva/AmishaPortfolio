@@ -1,0 +1,31 @@
+<html>
+	<head>
+		<title>Blog app</title>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" integrity="sha512-8bHTC73gkZ7rZ7vpqUQThUDhqcNFyYi2xgDgPDHc+GXVGHXq+xPjynxIopALmOPqzo9JZj0k6OqqewdGO3EsrQ==" crossorigin="anonymous" />
+		<link rel="stylesheet" href="/stylesheets/app.css" />
+	</head>
+	
+	
+	<body>
+		<div class="ui fixed inverted menu">
+			<div class="ui container">
+				<div class="header item"><i class="code icon"></i><a href="/blogs">Blog Site</a></div>
+				<a href="/" class="item">Home</a>
+				<% if(currentUser && (currentUser.username === "amisha@ravi2007")) { %>
+					<a href="/blogs/new" class="item">New post</a>
+				<% } %>
+			</div>
+			<div class="right menu">
+				<% if(!currentUser){ %>
+					<a class="ui item" href="/login">Login!</a>
+					<a class="ui item" href="/register">SignUp!</a>
+				<% }else{ %>
+					<a class="ui item" href="#">Signed in as <%= currentUser.username %>!</a>
+					<a class="ui item" href="/logout">Logout!</a>
+				<% } %>
+				
+    			
+  			</div>
+		</div>
+		
+	
