@@ -17,8 +17,10 @@ app.use(flash());
 app.use(expressSanitizer());
 app.use(methodOverride("_method"));
 
+// mongodb://localhost:27017/amisha
+
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/amisha', {
+mongoose.connect('mongodb+srv://devsprout:test@2098@cluster0.0eqnx.mongodb.net/<dbname>?retryWrites=true&w=majority', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
@@ -428,7 +430,7 @@ function checkCommentOwnership(req, res, next){
 
 
 
-
-app.listen(3000,function(){
-	console.log('started');
-})
+var port = process.env.PORT || 3000;
+app.listen(port, function () {
+  console.log("Server Has Started!");
+});
