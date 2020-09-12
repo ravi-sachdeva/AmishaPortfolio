@@ -11,6 +11,7 @@ var passportLocalMongoose = require("passport-local-mongoose");
 
 app.set("view engine","ejs");
 app.use(express.static("public"));
+app.use(flash());
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(flash());
 app.use(expressSanitizer());
@@ -81,6 +82,8 @@ app.use(require("express-session")({
 	resave:false,
 	saveUninitialized:false
 }));
+
+
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new localStrategy(User.authenticate()));
@@ -91,6 +94,9 @@ passport.deserializeUser(User.deserializeUser());
 
 app.use(function(req, res, next){
    res.locals.currentUser = req.user;
+	 
+   res.locals.error = req.flash("error");
+   res.locals.success = req.flash("success");
    next();
 });
 
@@ -218,11 +224,11 @@ app.post("/register", function(req, res){
     var newUser = new User({username: req.body.username});
     User.register(newUser, req.body.password, function(err, user){
         if(err){
-            console.log(err);
-            return res.render("register");
+            req.flash("error",err.message);
+            return res.redirect("/register");
         }
         passport.authenticate("local")(req, res, function(){
-		   console.log("new user registered");
+		   req.flash("success","Welcome to my blogs "+user.username +" !!");
            res.redirect("/blogs");
         });
     });
@@ -257,7 +263,7 @@ app.post("/login", passport.authenticate("local",
 // logout route
 app.get("/logout", function(req, res){
    req.logout();
-	console.log("logged out!");
+	req.flash("success","Logged out successfully");
    res.redirect("/blogs");
 });
 
@@ -276,6 +282,7 @@ app.get("/blogs/:id/newComment",isLoggedIn, function(req, res){
     // console.log(req.params.id);
     Blog.findById(req.params.id, function(err, blog){
         if(err){
+			req.flash("error","Blog not found!");
             res.redirect("/blogs");
         } else {
              res.render("newComment", {blog:blog});
@@ -288,7 +295,7 @@ app.post("/blogs/:id",isLoggedIn,function(req, res){
    //lookup campground using ID
    Blog.findById(req.params.id, function(err, blog){
        if(err){
-           console.log("blog not found");
+           req.flash("error",err.message);
            res.redirect("/blogs");
        } else {
         Comment.create(req.body.comment, function(err, comment){
@@ -304,7 +311,7 @@ app.post("/blogs/:id",isLoggedIn,function(req, res){
                blog.comments.push(comment);
                blog.save();
                req.flash("success", "Successfully added comment");
-               res.redirect('/blogs');
+               res.redirect('/blogs/'+req.params.id);
            }
         });
        }
@@ -320,9 +327,10 @@ app.post("/blogs/:id",isLoggedIn,function(req, res){
 app.get("/blogs/:id/comments/:comment_id/edit",checkCommentOwnership,function(req, res){
    Comment.findById(req.params.comment_id, function(err, foundComment){
       if(err){
+		  req.flash("error","Couldnt find  that comment!");
           res.redirect("back");
       } else {
-        res.render("editComment", {blog_id: req.params.id, comment: foundComment});
+          res.render("editComment", {blog_id: req.params.id, comment: foundComment});
       }
    });
 });
@@ -334,8 +342,10 @@ app.get("/blogs/:id/comments/:comment_id/edit",checkCommentOwnership,function(re
 app.put("/blogs/:id/comments/:comment_id", checkCommentOwnership, function(req, res){
    Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, function(err, updatedComment){
       if(err){
+		  req.put("error","Comment was not edited");
           res.redirect("back");
       } else {
+		  req.flash("success","Your comment was edited successfully");
           res.redirect("/blogs/" + req.params.id );
       }
    });
@@ -352,20 +362,14 @@ app.delete("/blogs/:id/comments/:comment_id",checkCommentOwnership, function(req
     //findByIdAndRemove
     Comment.findByIdAndRemove(req.params.comment_id, function(err){
        if(err){
+		   req.flash("error","ERROR ! Comment could not be deleted");
            res.redirect("back");
        } else {
+		   req.flash("success","Comment deleted successfully !");
            res.redirect("/blogs/" + req.params.id);
        }
     });
 });
-
-
-
-
-
-
-
-
 
 
 
@@ -379,6 +383,7 @@ function isLoggedIn(req, res, next){
     if(req.isAuthenticated()){
         return next();
     }
+	req.flash("error","You need to be Logged in First !!")
     res.redirect("/login");
 }
 
@@ -389,11 +394,13 @@ function isAdminCheck(req,res,next){
 			next();
 		}
 		else{
-			res.render("notallowed");
+			req.flash("error","YOU NEED TO BE THE ADMINISTRATOR TO DO THAT !!");
+			res.redirect("back");
 		}
 	}
 	else{
-		res.render("login");
+		req.flash("error","You need to be logged in to do that !!");
+		res.redirect("/login");
 	}
 }
 
@@ -401,17 +408,20 @@ function checkCommentOwnership(req, res, next){
 	if(req.isAuthenticated()){
         Comment.findById(req.params.comment_id, function(err, foundComment){
            if(err){
+			   req.flash("error","Comment not found!");
                res.redirect("back");
            }  else {
                // does user own the comment?
             if(foundComment.author.id.equals(req.user._id)||req.user.username==="amisha@ravi2007") {
                 next();
             } else {
-                res.render("notallowed");
+				req.flash("error","You do not own the comment you want to EDIT!!");
+                res.redirect("back");
             }
            }
         });
     } else {
+		req.flash("error","You need to be logged in to do that !!");
         res.redirect("/login");
     }
 }

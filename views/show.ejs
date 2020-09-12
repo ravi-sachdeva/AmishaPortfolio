@@ -1,7 +1,5 @@
 <%-include("./partials/header")%>
-<h1>
-	
-</h1>
+
 <div class="ui main text container segment">
 	<div class="ui center aligned purple huge header"><%=blog.title%></div>
 	<div class="ui top attached">
@@ -31,14 +29,14 @@
 			
 			
 			<%if(currentUser && currentUser.username === "amisha@ravi2007") { %>
-				<a href="/blogs/<%=blog._id%>/edit" class="ui orange basic button">Edit!</a>
+				<a href="/blogs/<%=blog._id%>/edit" class="ui purple button">Edit!</a>
 				<form method="POST" action="/blogs/<%=blog._id%>?_method=DELETE" style="display:inline">
-					<button class="ui red basic button" >
+					<button class="ui red  button" >
 						Delete
 					</button>	
 				</form>
 			<%}%>
-			<a href="/blogs/<%=blog._id%>/newComment" class="ui blue basic button">Add comment</a>
+			<a href="/blogs/<%=blog._id%>/newComment" class="ui green button">Add comment+</a>
 		</div>
 	</div>
 	
@@ -55,7 +53,11 @@
       <img src="/images/avatar/small/matt.jpg">
     </a> -->
     <div class="content">
-      <a class="author"><%=comment.author.username%></a>
+		<%if(comment.author.username==="amisha@ravi2007"){ %>
+		<a class="author" style="color:red;text-decoration:underline"> Amisha Lawaniya (Admin)</a>
+		<%}else{%>
+		<a class="author"><%=comment.author.username%></a>
+		<%}%>
       <div class="metadata">
         <span class="date"><%=comment.created.toLocaleString(undefined, {timeZone: 'Asia/Kolkata'})%></span>
       </div>
@@ -68,7 +70,9 @@
 				<input type="submit" value="Delete" class="ui red button mini">
 			</form>
 		</span>  
+		  <br><br>
 		  <%}%>
+		  
       </div>
      
     </div>

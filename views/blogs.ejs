@@ -1,9 +1,7 @@
 <%-include("./partials/header")%>
-<h1>
-	
-</h1>
+
 <div class="ui main text container">
-   <div class="ui huge header">Recipes To Relish! 🥗🥝</div>
+   <h1 class="ui header">Recipes To Relish! 🥗🥝</h1>
    <div class="ui top attached segment">
       <div class="ui divided items">
          <%blogs.forEach(function(blog){%>
@@ -12,7 +10,7 @@
                <img src="<%=blog.image%>">
             </div>
             <div class="content">
-               <a class="header" href="/blogs/<%=blog._id%>"><%=blog.title%></a>
+               <a class="ui header" href="/blogs/<%=blog._id%>"><%=blog.title%></a>
                <div class="meta">
                   <span><%=blog.created.toDateString()%></span>
                </div>
